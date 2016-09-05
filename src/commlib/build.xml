@@ -1,0 +1,138 @@
+<project name="name-rex-commlib" default="usage" basedir=".">
+
+    <description>
+        Common Java Library API(Rex) Build file.
+    </description>
+
+    <property name="doctitle" value="Common Java Library API(Rex)"/>
+    <property name="version" value="1.0"/>
+    <property name="src" location="src"/>
+    <property name="dist" location="${basedir}/dist"/>
+    <property name="classes" location="${dist}/classes"/>
+    <property name="target" location="${basedir}/../../lib/commlib"/>
+    <property name="backup" location="${basedir}/../../backup/commlib"/>
+
+    <condition property="isWindows">  
+        <os family="windows"/>  
+    </condition>  
+    <condition property="isLinux">  
+        <os family="unix"/>  
+    </condition>
+
+    <target name="usage">
+        <echo>
+
+    These are the targets supported by this ANT build scpript:
+
+    build   - compile all project files, if a certain library is missing,
+         then the compilation of its dependents are skipped.
+
+    javadoc - build project javadoc files
+
+    jar     - build project jar files
+
+    dist    - will create a complete distribution in dist/
+        </echo>
+    </target>
+
+    <target name="init" description="prepare for project">
+        <tstamp/>
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="build" depends="init" description="compile all project files." >
+        <javac destdir="${classes}" debug="true" debuglevel="vars,lines" includeAntRuntime="no" deprecation="on" encoding='utf-8'>
+            <compilerarg value="-Xlint:unchecked"/>
+            <classpath>
+                <fileset dir="${basedir}/lib">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <src path="${src}"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="build" description="build project jar files.">
+        <jar destfile="${dist}/${ant.project.name}-${version}.jar"
+            basedir="${classes}"
+            excludes="*.class"/>
+    </target>
+
+    <target name="java-doc" depends="init" description="build project javadoc files.">
+        <javadoc destdir="${dist}/doc" encoding="UTF-8" docencoding="UTF-8">  
+            <doctitle>${doctitle}</doctitle>  
+            <header>${doctitle}</header>  
+            <footer>${doctitle}</footer>
+            <classpath>
+                <fileset dir="${basedir}/lib">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <fileset dir="${src}" defaultexcludes="yes"/>  
+        </javadoc>
+        <jar destfile="${dist}/${ant.project.name}-${version}-javadoc.jar"
+            basedir="${dist}/doc"/>
+    </target>
+
+    <target name="java-source" depends="init" description="jar source file.">
+        <jar destfile="${dist}/${ant.project.name}-${version}-source.jar"
+            basedir="${src}"/>
+    </target>
+
+    <target name="target" depends="" description="copy new jar file to target">
+        <mkdir dir="${target}"/>
+        <mkdir dir="${backup}"/>
+        <!-- 删除同版本老的文件 -->
+        <delete file="${target}/${ant.project.name}-${version}.jar"/>
+        <delete file="${target}/${ant.project.name}-${version}-javadoc.jar"/>
+        <delete file="${target}/${ant.project.name}-${version}-source.jar"/>
+        <!-- 备份老版本 -->
+        <move todir="${backup}">
+            <fileset dir="${target}">
+                <include name="${ant.project.name}*.jar"/>
+            </fileset>
+        </move>
+        <!-- 生成新版本 -->
+        <copy todir="${target}">
+            <fileset dir="${dist}">
+                <include name="${ant.project.name}-${version}*.jar"/>
+            </fileset>
+            <fileset dir="${basedir}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="dist" depends="jar,java-doc,java-source,target" description="create complete distribution.">
+    </target>
+
+    <target name="clean-tests-windows" if="isWindows" description="clean test case.">
+        <exec executable="cmd" dir="${basedir}/tests">
+            <arg value="/c"/>
+            <arg value="ant"/>
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="clean-tests-linux" if="isLinux" description="clean test case.">
+        <exec executable="ant" dir="${basedir}/tests">
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-tests-linux,clean-tests-windows" description="clean project build file." >
+        <delete dir="${dist}"/>
+    </target>
+
+    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <property name="findbugs.home" value="/usr/local/findbugs"/>
+    <target name="findbugs" depends="build">
+        <findbugs home="${findbugs.home}" reportLevel="low"
+              output="html" outputFile="${dist}/findbugs.html" >
+            <sourcePath path="${src}" />
+            <class location="${classes}" />
+        </findbugs>
+    </target>
+
+</project>

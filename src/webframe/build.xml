@@ -1,0 +1,76 @@
+<project name="webframe" default="usage" basedir=".">
+
+    <description>
+       WebFrame sample site. 
+    </description>
+
+    <property name="version" value="1.0"/>
+    <property name="src" location="src"/>
+    <property name="dist" location="${basedir}/dist"/>
+    <property name="webroot" location="${dist}/${ant.project.name}"/>
+    <property name="webinf" location="${webroot}/WEB-INF"/>
+    <property name="classes" location="${webinf}/classes"/>
+    <property name="javalib" location="${basedir}/../.."/>
+    
+    <target name="usage">
+        <echo>
+
+    These are the targets supported by this ANT build scpript:
+
+    build   - compile all project files, if a certain library is missing,
+         then the compilation of its dependents are skipped.
+
+    war     - build project war files
+
+        </echo>
+    </target>
+
+    <target name="init" description="prepare for project">
+        <tstamp/>
+        <mkdir dir="${dist}"/>
+        <copy todir="${webroot}">
+            <fileset dir="${basedir}/webroot">
+                <exclude name=".svn"/>
+            </fileset>
+        </copy>
+        <copy todir="${webinf}/lib">
+            <fileset dir="${javalib}/lib/commlib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${webinf}/lib">
+            <fileset dir="${javalib}/lib/web">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${webinf}/lib">
+            <fileset dir="${basedir}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="update-jar-file" description="update jar file from javalib">
+    </target>
+
+    <target name="build" depends="init" description="compile all project files." >
+        <javac destdir="${classes}" debug="true" debuglevel="vars,lines" includeAntRuntime="no" deprecation="on">
+            <compilerarg value="-Xlint:unchecked"/>
+            <classpath>
+                <fileset dir="${webinf}/lib">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <src path="${src}"/>
+        </javac>
+    </target>
+
+    <target name="dist" depends="build">
+    </target>
+
+    <target name="clean" description="clean project build file." >
+        <delete dir="${dist}"/>
+    </target>
+
+</project>

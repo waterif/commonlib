@@ -1,0 +1,63 @@
+<project name="junit-single" default="usage" basedir=".">
+
+    <description>
+        Junit single extend.
+    </description>
+
+    <property name="doctitle" value="Junit single extend."/>
+    <property name="version" value="1.0"/>
+    <property name="src" location="src"/>
+    <property name="dist" location="dist"/>
+    <property name="classes" location="${dist}/classes"/>
+
+    <target name="usage">
+        <echo>
+
+    These are the targets supported by this ANT build scpript:
+
+    build   - compile all project files, if a certain library is missing,
+         then the compilation of its dependents are skipped.
+
+    javadoc - build project javadoc files
+
+    jar     - build project jar files
+
+    dist    - will create a complete distribution in dist/
+              Setting the env variable NO_JAVADOC will build the distribution
+              without running the javadoc target.
+        </echo>
+    </target>
+
+    <target name="init" description="prepare for project">
+        <tstamp/>
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="build" depends="init" description="compile all project files." >
+        <javac destdir="${classes}" debug="true" debuglevel="vars,lines" includeAntRuntime="no" deprecation="on">
+            <compilerarg value="-Xlint:unchecked"/>
+			<compilerarg line="-encoding UTF-8 "/> 
+            <classpath>
+                <fileset dir="${basedir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <src path="${src}"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="build" description="build project jar files.">
+        <jar destfile="${basedir}/${ant.project.name}-${version}.jar"
+            basedir="${classes}"
+            excludes="*.class"/>
+    </target>
+
+    <target name="dist" depends="jar" description="create complete distribution.">
+    </target>
+
+    <target name="clean" description="clean project build file." >
+        <delete dir="${dist}"/>
+    </target>
+
+</project>

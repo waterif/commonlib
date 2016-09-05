@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DBCluster>  
+     <classname>name.rex.commlib.database.cluster.SingleCluster</classname>     
+     <parameters> 
+         <driverName>com.mysql.jdbc.Driver</driverName>                	
+    	 <dataSource>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</dataSource>
+    	 <userName>root</userName>
+    	 <password>changpu</password>
+    	 <maxConnect>5</maxConnect>
+    	 <timeout>5</timeout>    	
+    </parameters>      
+</DBCluster>

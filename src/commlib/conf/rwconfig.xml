@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DBCluster>  
+     <classname>name.rex.commlib.database.cluster.RWCluster</classname>     
+     <parameters> 
+         <driverName>com.mysql.jdbc.Driver</driverName>
+         <write>          	
+    	 	<dataSource>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</dataSource>
+    	 	<userName>root</userName>
+    	 	<password>changpu</password>
+    	 	<maxConnect>5</maxConnect>
+    	 	<timeout>5</timeout>
+    	 </write>
+    	 <read>
+    	     <dataSource>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</dataSource>
+    	 	<userName>root</userName>
+    	 	<password>changpu</password>
+    	 	<maxConnect>10</maxConnect>
+    	 	<timeout>5</timeout>
+    	 </read>
+    	 <read>
+    	     <dataSource>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</dataSource>
+    	 	<userName>root</userName>
+    	 	<password>changpu</password>
+    	 	<maxConnect>10</maxConnect>
+    	 	<timeout>5</timeout>
+    	 </read>
+    </parameters>      
+</DBCluster>

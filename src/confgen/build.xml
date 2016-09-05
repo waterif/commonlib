@@ -1,0 +1,117 @@
+<project name="name-rex-confgen" default="usage" basedir=".">
+
+    <description>
+        Config file generator build file.
+    </description>
+
+    <property name="doctitle" value="Config file generator build file."/>
+    <property name="version" value="1.0"/>
+    <property name="src" location="src"/>
+    <property name="dist" location="${basedir}/dist"/>
+    <property name="classes" location="${dist}/classes"/>
+    <property name="javalib" location="${basedir}/../.."/>
+
+    <condition property="isWindows">  
+        <os family="windows"/>  
+    </condition>  
+    <condition property="isLinux">  
+        <os family="unix"/>  
+    </condition>
+
+    <target name="usage">
+        <echo>
+
+    These are the targets supported by this ANT build scpript:
+
+    build   - compile all project files, if a certain library is missing,
+         then the compilation of its dependents are skipped.
+
+    javadoc - build project javadoc files
+
+    jar     - build project jar files
+
+    dist    - will create a complete distribution in dist/
+        </echo>
+    </target>
+
+    <target name="init" description="prepare for project">
+        <tstamp/>
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${classes}"/>
+        <copy todir="${dist}/bin">
+            <fileset dir="${basedir}/bin">
+                <exclude name=".svn"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist}/etc">
+            <fileset dir="${basedir}/etc">
+                <exclude name=".svn"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist}/lib">
+            <fileset dir="${basedir}/lib">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${javalib}/lib/commlib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist}/samples">
+            <fileset dir="${basedir}/samples">
+                <exclude name=".svn"/>
+            </fileset>
+        </copy>
+        <chmod file="${dist}/bin/confgen" perm="a+x"/>
+        <chmod file="${dist}/samples/test.sh" perm="a+x"/>
+    </target>
+
+    <target name="build" depends="init" description="compile all project files." >
+        <javac destdir="${classes}" debug="true" debuglevel="vars,lines" includeAntRuntime="no" deprecation="on" encoding='utf-8'>
+            <compilerarg value="-Xlint:unchecked"/>
+            <classpath>
+                <fileset dir="${dist}/lib">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <src path="${src}"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="build" description="build project jar files.">
+        <jar destfile="${dist}/lib/${ant.project.name}-${version}.jar"
+            basedir="${classes}"
+            excludes="*.class"/>
+    </target>
+
+    <target name="dist" depends="jar" description="create complete distribution.">
+    </target>
+
+    <target name="clean-tests-windows" if="isWindows" description="clean test case.">
+        <exec executable="cmd" dir="${basedir}/tests">
+            <arg value="/c"/>
+            <arg value="ant"/>
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="clean-tests-linux" if="isLinux" description="clean test case.">
+        <exec executable="ant" dir="${basedir}/tests">
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-tests-linux,clean-tests-windows" description="clean project build file." >
+        <delete dir="${dist}"/>
+    </target>
+
+    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <property name="findbugs.home" value="/usr/local/findbugs"/>
+    <target name="findbugs" depends="build">
+        <findbugs home="${findbugs.home}" reportLevel="low"
+              output="html" outputFile="${dist}/findbugs.html" >
+            <sourcePath path="${src}" />
+            <class location="${classes}" />
+        </findbugs>
+    </target>
+
+</project>

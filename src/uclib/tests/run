@@ -1,0 +1,59 @@
+#!/bin/sh
+
+CP=""
+SDIR=`dirname $0`
+SDIR=`cd ${SDIR}; pwd`
+
+usage()
+{
+    echo "Usage: run <TestClassName[#methodName]>"
+    echo ""
+}
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+loadClassPath()
+{
+    local classFile="$1/classpath"
+    local tempFile="$1/.classpath"
+
+    echo -n "" > ${tempFile}
+    cat "${classFile}" 2>/dev/null | sed -e 's/^ *//g' | sed -e 's/ *$//g'  | grep -v "^#" | while read LINE
+    do
+        case $LINE in
+        \/*)
+            ;;
+        *)
+            LINE=${SDIR}/$LINE
+            ;;
+        esac
+        echo "loadClassPath: ${LINE}"
+        echo -n "${LINE}:" >> "${tempFile}"
+    done
+    CP="${CP}"`cat ${tempFile}`
+}
+
+echo 
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>"
+
+loadClassPath "${SDIR}"
+echo
+
+CP="${CP}${SDIR}/lib/*:${SDIR}/lib:${SDIR}/dist/classes"
+className=`echo "$1" | awk -F# '{ print $1 }' 2>/dev/null`
+methodName=`echo "$1" | awk -F# '{ print $2 }' 2>/dev/null`
+
+echo "ClassPath: " ${CP}
+echo "className: " ${className}
+echo "methodName: " ${methodName}
+echo "<<<<<<<<<<<<<<<<<<<<<<<<<"
+echo 
+
+if [ -n "${methodName}" ]; then
+    java -cp "${CP}" org.junit.runner.single.SingleJUnitTestRunner $@
+else
+    java -cp "${CP}" org.junit.runner.JUnitCore "$1"
+fi

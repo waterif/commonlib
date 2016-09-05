@@ -1,0 +1,16 @@
+#!/bin/sh
+#make root file system for debian pakcage
+#EnvirmentVar: DEB_ROOTFS, DEB_CTRLDIR
+
+export CONFGEN_HOME=/usr/local/confgen
+mkdir -p "${DEB_ROOTFS}/${CONFGEN_HOME}" || exit 1
+cp -R -a "dist/bin" "${DEB_ROOTFS}/${CONFGEN_HOME}" || exit 2
+cp -R -a "dist/etc" "${DEB_ROOTFS}/${CONFGEN_HOME}" || exit 3
+cp -R -a "dist/lib" "${DEB_ROOTFS}/${CONFGEN_HOME}" || exit 4
+cp -R -a "dist/samples" "${DEB_ROOTFS}/${CONFGEN_HOME}" || exit 5
+rm -rf "${DEB_ROOTFS}/${CONFGEN_HOME}/classes"
+
+chown -R root:root "${DEB_ROOTFS}" || exit 11
+chmod a+x "${DEB_ROOTFS}/${CONFGEN_HOME}/bin/confgen" || exit 12
+chmod a+x "${DEB_ROOTFS}/${CONFGEN_HOME}/samples/test.sh" || exit 13
+

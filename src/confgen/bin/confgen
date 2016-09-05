@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ -L "$0" ]; then
+    CMDNAME=`readlink "$0"`
+    if [ -z "$CMDNAME" ]; then
+        echo "Error: not found valid command file."
+        exit 100
+    fi
+else
+    CMDNAME="$0"
+fi
+
+SCRIPTDIR=`dirname "${CMDNAME}"`;
+CONFGEN_HOME=`cd ${SCRIPTDIR}; cd ..; pwd`
+BIN_PATH="${CONFGEN_HOME}/bin"
+ETC_PATH="${CONFGEN_HOME}/etc"
+LIB_PATH="${CONFGEN_HOME}/lib"
+CLASSES_PATH="${CONFGEN_HOME}/classes"
+
+if [ -d "${CLASSES_PATH}" ]; then
+    CP="${CLASSES_PATH}:"
+fi
+
+CP="${CP}${LIB_PATH}/*:${ETC_PATH}"
+
+#echo "CP: ${CP}"
+#echo "ARGS: $@"
+
+export CONFGEN_HOME
+java -cp "${CP}" name.rex.confgen.Main $@

@@ -1,0 +1,8 @@
+{
+    "testElem2":{
+        "value":"testElem2DefaultValue",
+    },
+    "testElem6":{
+        "value":"testElem6DefaultValue"
+    }
+}
